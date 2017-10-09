@@ -1,5 +1,6 @@
 (ns webbank.core-test
-	(:require [clojure.test :refer :all]
+	(:require
+		[clojure.test :refer :all]
 		[ring.mock.request :as mock]
 		[cheshire.core :refer :all]
 		[webbank.core :as core]))
@@ -13,10 +14,10 @@
 )
 
 (deftest test-routes
-	(testing "/credit endpoint"
+	(testing "/credits endpoint"
 		(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20, "date" "2015-07-13"})
 			expected-response (generate-string {})
-			response (request-application "/credit" json-request)]
+			response (request-application "/credits" json-request)]
 
 			(is (= 200 (:status response)))
 			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
@@ -24,10 +25,10 @@
 		)
 	)
 
-	(testing "/debit endpoint"
+	(testing "/debits endpoint"
 		(let [json-request (generate-string { "account" "BA47856", "description" "Purchase", "amount" 3651.98, "date" "2016-02-21"})
 			expected-response (generate-string {})
-			response (request-application "/debit" json-request)]
+			response (request-application "/debits" json-request)]
 
 			(is (= 200 (:status response)))
 			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
@@ -35,10 +36,10 @@
 		)
 	)
 
-	(testing "/balance endpoint"
+	(testing "/balances endpoint"
 		(let [json-request (generate-string {"account" "BA47856"})
 			expected-response (generate-string {"balance" -1280.78})
-			response (request-application "/balance" json-request)]
+			response (request-application "/balances" json-request)]
 
 			(is (= 200 (:status response)))
 			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
@@ -46,10 +47,10 @@
 		)
 	)
 
-	(testing "/statement endpoint"
+	(testing "/statements endpoint"
 		(let [json-request (generate-string {"account" "BA47856", "start" "2015-07-13", "end" "2016-02-21"})
 			expected-response (generate-string {})
-			response (request-application "/statement" json-request)]
+			response (request-application "/statements" json-request)]
 
 			(is (= 200 (:status response)))
 			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))

@@ -3,7 +3,7 @@
 		[clj-time.core :as clj-time]))
 
 
-(def empty-bank {})
+(def ^:private empty-bank {})
 (def bank (atom empty-bank))
 
 
@@ -18,7 +18,7 @@
 	(reset! bank empty-bank)
 )
 
-(defn create-account
+(defn ^:private create-account
 	"Adds new empty account to bank identified by account-number."
 	[account-number]
 	(->
@@ -85,7 +85,7 @@
 	))
 )
 
-(defn balance-from-daily-statement
+(defn ^:private balance-from-daily-statement
 	"Extracts balance from daily-statement."
 	[daily-statement]
 	(if daily-statement

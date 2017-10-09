@@ -8,10 +8,10 @@
 
 
 (defroutes server-routes
-	(POST "/credit" {body :body} (api/credit-account body))
-	(POST "/debit" {body :body} (api/debit-account body))
-	(POST "/balance" {body :body} (api/request-balance body))
-	(POST "/statement" {body :body} (api/request-statement body))
+	(POST "/credits" {body :body} (api/credit-account body))
+	(POST "/debits" {body :body} (api/debit-account body))
+	(POST "/balances" {body :body} (api/request-balance body))
+	(POST "/statements" {body :body} (api/request-statement body))
 	(POST "/debts" {body :body} (api/request-debts body))
 	(route/not-found "Page not found")
 )

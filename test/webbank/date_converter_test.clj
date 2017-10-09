@@ -1,5 +1,6 @@
 (ns webbank.date-converter-test
-	(:require [clojure.test :refer :all]
+	(:require
+		[clojure.test :refer :all]
 		[clj-time.core :as clj-time]
 		[webbank.date-converter :as date-converter]))
 
