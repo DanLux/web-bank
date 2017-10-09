@@ -1,4 +1,4 @@
-(ns nubank.core-test
+(ns webbank.core-test
   (:require [clojure.test :refer :all]
             [nubank.core :refer :all]))
 
