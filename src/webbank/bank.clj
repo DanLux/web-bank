@@ -7,6 +7,11 @@
 (def bank (atom empty-bank))
 
 
+(defn debug-bank []
+	(println "\nBank status:")
+	(println @bank)
+)
+
 (defn reset-bank
 	"Returns bank to its original state."
 	[]
@@ -33,10 +38,10 @@
 )
 
 (defn add-account-operation
-	"Add new operation to bank account identified by account-number.
+	"Adds new operation to bank account identified by account-number.
 	This operation is represented by a short description, an amount and the date it happened."
 	[account-number description amount date]
-	(let [new_operation { :description description :amount amount }]
+	(let [new_operation {:description description :amount amount}]
 		(as-> (get-account-by account-number) input
 			(get input date [])
 			(conj input new_operation)
@@ -51,7 +56,7 @@
 	(->>
 		(get account date [])
 		(map #(:amount %))
-		(reduce + 0.0)
+		(reduce + 0.00M)
 	)
 )
 
@@ -61,7 +66,7 @@
 	(let [account (get-account-by account-number)]
 		(loop [[current-date & next-dates] (keys account)
 				statement-map account
-				balance-accumulator 0.0]
+				balance-accumulator 0.00M]
 			(if current-date
 				(do (let [new-balance (+ balance-accumulator (daily-balance account current-date))
 						  current-operations (get account current-date [])]
@@ -85,12 +90,12 @@
 	[daily-statement]
 	(if daily-statement
 		((comp second val) daily-statement)
-		0.00
+		0.00M
 	)
 )
 
 (defn current-balance
-	"Current balance relating to the bank account identified by account-number."
+	"Gets current balance related to the bank account identified by account-number."
 	[account-number]
 	(balance-from-daily-statement (last (account-statement account-number)))
 )

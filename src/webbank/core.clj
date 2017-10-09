@@ -2,23 +2,33 @@
   	(:require
   		[org.httpkit.server :refer [run-server]]
 		[compojure.core :refer :all]
+		[compojure.route :as route]
   		[ring.middleware.json :as middleware]
-  		[webbank.routes]))
+  		[webbank.api :as api]))
+
+
+(defroutes server-routes
+	(POST "/credit" {body :body} (api/credit-account body))
+	(POST "/debit" {body :body} (api/debit-account body))
+	(POST "/balance" {body :body} (api/request-balance body))
+	(POST "/statement" {body :body} (api/request-statement body))
+	(POST "/debts" {body :body} (api/request-debts body))
+	(route/not-found "Page not found")
+)
 
 (defn attach-middleware
-	"Add Ring middlewares to parse json request bodies and setup json response headers."
+	"Adds Ring middlewares to parse json request bodies and setup json response headers."
 	[app-routes]
   	(-> app-routes
     	(middleware/wrap-json-body)
     	(middleware/wrap-json-response))
 )
 
+(def application (attach-middleware server-routes))
+
 (defn -main
 	"Starts web server on port 5000."
 	[& args]
 	(println "Web server running on port 5000.")
-	(-> webbank.routes/server-routes
-		(attach-middleware)
-		(run-server {:port 5000})
-	)
+	(run-server application {:port 5000})
 )
