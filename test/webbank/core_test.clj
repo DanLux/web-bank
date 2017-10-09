@@ -26,7 +26,7 @@
 	)
 
 	(testing "/credits endpoint"
-		(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20, "date" "2016-07-13"})
+		(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20M, "date" "2016-07-13"})
 			expected-response (generate-string {})
 			response (request-application "/credits" json-request)]
 
@@ -37,7 +37,7 @@
 	)
 
 	(testing "/debits endpoint"
-		(let [json-request (generate-string { "account" "BA47856", "description" "Purchase", "amount" 3651.98, "date" "2015-12-21"})
+		(let [json-request (generate-string { "account" "BA47856", "description" "Purchase", "amount" 3651.98M, "date" "2015-12-21"})
 			expected-response (generate-string {})
 			response (request-application "/debits" json-request)]
 
@@ -49,7 +49,7 @@
 
 	(testing "/balances endpoint"
 		(let [json-request (generate-string {"account" "BA47856"})
-			expected-response (generate-string {"amount" -1280.78})
+			expected-response (generate-string {"amount" -1280.78M})
 			response (request-application "/balances" json-request)]
 
 			(is (= 200 (:status response)))
@@ -61,8 +61,8 @@
 	(testing "/statements endpoint"
 		(let [json-request (generate-string {"account" "BA47856", "start" "2015-12-21", "end" "2016-07-13"})
 			expected-response (generate-string {
-				"2015-12-21" [[{"description" "Purchase", "amount" -3651.98}], -3651.98],
-				"2016-07-13" [[{"description" "Salary", "amount" 2371.20}], -1280.78]
+				"2015-12-21" [[{"description" "Purchase", "amount" -3651.98M}], -3651.98M],
+				"2016-07-13" [[{"description" "Salary", "amount" 2371.20M}], -1280.78M]
 			})
 			response (request-application "/statements" json-request)]
 

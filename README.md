@@ -48,7 +48,7 @@ Endpoint   | Bank Operation
 For a credit<sup>[1](https://github.com/DanLux/nubank/blob/master/resources/requests-examples/credits.json)</sup> or debit<sup>[2](https://github.com/DanLux/nubank/blob/master/resources/requests-examples/debits.json)</sup> operation, current account balance<sup>[3](https://github.com/DanLux/nubank/blob/master/resources/requests-examples/balances.json)</sup>, account statement<sup>[4](https://github.com/DanLux/nubank/blob/master/resources/requests-examples/statements.json)</sup> and periods of debt<sup>[5](https://github.com/DanLux/nubank/blob/master/resources/requests-examples/debts.json)</sup>.
 
 > All values in the examples are arbitrary.
-> One must only pay attention to the json string keys and the json value types and formats.
+One must only pay attention to the json string keys and the json value types and formats.
 
 
 ## Responses

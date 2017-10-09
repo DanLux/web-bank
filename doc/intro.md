@@ -1,5 +1,4 @@
-# Description
-=============
+# Problem Description
 
 A checking account from a bank allows for putting (deposits, salaries, credits)
 or taking (purchases, withdrawals, debits) money at any given time.
