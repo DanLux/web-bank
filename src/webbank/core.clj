@@ -13,7 +13,7 @@
 	(POST "/balances" {body :body} (api/request-balance body))
 	(POST "/statements" {body :body} (api/request-statement body))
 	(POST "/debts" {body :body} (api/request-debts body))
-	(route/not-found "Page not found")
+	(route/not-found "Resource not found")
 )
 
 (defn attach-middleware

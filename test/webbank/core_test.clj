@@ -38,7 +38,7 @@
 
 	(testing "/balances endpoint"
 		(let [json-request (generate-string {"account" "BA47856"})
-			expected-response (generate-string {"balance" -1280.78})
+			expected-response (generate-string {"amount" -1280.78})
 			response (request-application "/balances" json-request)]
 
 			(is (= 200 (:status response)))
@@ -71,7 +71,7 @@
 
 	(testing "nonexistent endpoint"
 		(let [json-request (generate-string {})
-			expected-response "Page not found"
+			expected-response "Resource not found"
 			response (request-application "/nonexistent" json-request)]
 
 			(is (= 404 (:status response)))

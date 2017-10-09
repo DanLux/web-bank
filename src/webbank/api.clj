@@ -20,7 +20,7 @@
 	[request]
 	(let [account-number (get request "account")
 		description (get request "description")
-		amount (new BigDecimal (str (get request "amount")))
+		amount (.setScale (new BigDecimal (str (get request "amount"))) 2)
 		date (converter/from-string (get request "date"))]
 	(bank/add-account-operation account-number description amount date)
 	(response {}))
@@ -31,7 +31,7 @@
 	[request]
 	(let [account-number (get request "account")
 		description (get request "description")
-		amount (new BigDecimal (str (get request "amount")))
+		amount (.setScale (new BigDecimal (str (get request "amount"))) 2)
 		date (converter/from-string (get request "date"))]
 	(bank/add-account-operation account-number  description (- amount) date)
 	(response {}))
@@ -42,7 +42,7 @@
 	[request]
 	(let [account-number (get request "account")]
 	(response
-		{"balance" (bank/current-balance account-number)}))
+		{"amount" (bank/current-balance account-number)}))
 )
 
 (defn request-statement
