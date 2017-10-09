@@ -1,11 +1,11 @@
 {
 	"2017-04-20": [
-		{"description": "Deposit", "amount": 545.80},
+		[{"description": "Deposit", "amount": 545.80}],
 		545.80
 	],
 
 	"2017-05-13": [
-		{"description": "Purchase", "amount": -123.62},
+		[{"description": "Purchase", "amount": -123.62}],
 		422.18
 	]
 }

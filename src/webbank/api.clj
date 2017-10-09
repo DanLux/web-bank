@@ -14,6 +14,12 @@
 )
 ;;;;;;;;;;;;;;;;;;;;;
 
+(defn reset
+	"Forwards http reset request to bank service."
+	[request]
+	(bank/reset-bank)
+	(response {})
+)
 
 (defn credit-account
 	"Forwards http credit request to bank service."

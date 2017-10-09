@@ -14,8 +14,19 @@
 )
 
 (deftest test-routes
+	(testing "/reset endpoint"
+		(let [json-request (generate-string {})
+			expected-response (generate-string {})
+			response (request-application "/reset" json-request)]
+
+			(is (= 200 (:status response)))
+			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
+			(is (= expected-response (:body response)))
+		)
+	)
+
 	(testing "/credits endpoint"
-		(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20, "date" "2015-07-13"})
+		(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20, "date" "2016-07-13"})
 			expected-response (generate-string {})
 			response (request-application "/credits" json-request)]
 
@@ -26,7 +37,7 @@
 	)
 
 	(testing "/debits endpoint"
-		(let [json-request (generate-string { "account" "BA47856", "description" "Purchase", "amount" 3651.98, "date" "2016-02-21"})
+		(let [json-request (generate-string { "account" "BA47856", "description" "Purchase", "amount" 3651.98, "date" "2015-12-21"})
 			expected-response (generate-string {})
 			response (request-application "/debits" json-request)]
 
@@ -48,8 +59,11 @@
 	)
 
 	(testing "/statements endpoint"
-		(let [json-request (generate-string {"account" "BA47856", "start" "2015-07-13", "end" "2016-02-21"})
-			expected-response (generate-string {})
+		(let [json-request (generate-string {"account" "BA47856", "start" "2015-12-21", "end" "2016-07-13"})
+			expected-response (generate-string {
+				"2015-12-21" [[{"description" "Purchase", "amount" -3651.98}], -3651.98],
+				"2016-07-13" [[{"description" "Salary", "amount" 2371.20}], -1280.78]
+			})
 			response (request-application "/statements" json-request)]
 
 			(is (= 200 (:status response)))
