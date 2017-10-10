@@ -1,6 +1,6 @@
 {
 	"account": "ACC005",
 	"description": "Purchase",
-	"amount": 123.62,
+	"amount": -123.62,
 	"date": "2017-05-13"
 }

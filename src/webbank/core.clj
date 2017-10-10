@@ -8,8 +8,7 @@
 
 
 (defroutes server-routes
-	(POST "/credits" {body :body} (api/credit-account body))
-	(POST "/debits" {body :body} (api/debit-account body))
+	(POST "/transactions" {body :body} (api/request-transaction body))
 	(POST "/balances" {body :body} (api/request-balance body))
 	(POST "/statements" {body :body} (api/request-statement body))
 	(POST "/debts" {body :body} (api/request-debts body))

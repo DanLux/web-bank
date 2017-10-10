@@ -23,72 +23,72 @@
 	)
 )
 
-(deftest test-add-account-operation
-	(testing "add single credit operation"
+(deftest test-add-account-transaction
+	(testing "adding a single credit transaction"
 		(let [account-number "ABC01678"
 			description "Deposit"
 			amount 1405.00M
 			date (converter/from-string "2017-08-22")
-			expected-operation {:description description, :amount amount}]
+			expected-transaction {:description description, :amount amount}]
 
 			(reset-bank)
-			(add-account-operation account-number description amount date)
+			(add-account-transaction account-number description amount date)
 			(is (= 1 (count (vals @bank))))
-			(is (every? (partial = expected-operation) (get-in @bank [account-number date])))
+			(is (every? (partial = expected-transaction) (get-in @bank [account-number date])))
 		)
 	)
 
-	(testing "add single debit operation"
+	(testing "adding a single debit transaction"
 		(let [account-number "GTA961678-X"
-			description "Withdraw"
+			description "Withdrawal"
 			amount -760.75M
 			date (converter/from-string "2017-09-01")
-			expected-operation {:description description, :amount amount}]
+			expected-transaction {:description description, :amount amount}]
 
 			(reset-bank)
-			(add-account-operation account-number description amount date)
+			(add-account-transaction account-number description amount date)
 			(is (= 1 (count (vals @bank))))
-			(is (every? (partial = expected-operation) (get-in @bank [account-number date])))
+			(is (every? (partial = expected-transaction) (get-in @bank [account-number date])))
 		)
 	)
 
-	(testing "add multiple operations on same day"
+	(testing "adding multiple transactions on same day"
 		(let [account-number "GTA961678-X"
-			credit-description "Withdraw"
+			credit-description "Withdrawal"
 			debit-description "Deposit"
 			credit-amount 245.74M
 			debit-amount -170.21M
 			date (converter/from-string "2017-04-03")
-			expected-credit-operation {:description credit-description, :amount credit-amount}
-			expected-debit-operation {:description debit-description, :amount debit-amount}]
+			expected-credit-transaction {:description credit-description, :amount credit-amount}
+			expected-debit-transaction {:description debit-description, :amount debit-amount}]
 
 			(reset-bank)
-			(add-account-operation account-number credit-description credit-amount date)
-			(add-account-operation account-number debit-description debit-amount date)
+			(add-account-transaction account-number credit-description credit-amount date)
+			(add-account-transaction account-number debit-description debit-amount date)
 			(is (= 1 (count (vals @bank))))
-			(is (some (partial = expected-credit-operation) (get-in @bank [account-number date])))
-			(is (some (partial = expected-debit-operation) (get-in @bank [account-number date])))
+			(is (some (partial = expected-credit-transaction) (get-in @bank [account-number date])))
+			(is (some (partial = expected-debit-transaction) (get-in @bank [account-number date])))
 			(is (= 2 (count (get-in @bank [account-number date]))))
 		)
 	)
 
-	(testing "add multiple operations on different days and keep them sorted"
+	(testing "adding multiple transactions on different days and keeping them sorted"
 		(let [account-number "00007"
 			feb-date (converter/from-string "2017-02-21")
 			jul-date (converter/from-string "2017-07-14")
 			dec-date (converter/from-string "2017-12-31")
-			expected-feb-operation {:description "February salary", :amount 6500.00M}
-			expected-jul-operation {:description "July vacation", :amount -2604.01M}
-			expected-dec-operation {:description "New year purchases", :amount -590.49M}]
+			expected-feb-transaction {:description "February salary", :amount 6500.00M}
+			expected-jul-transaction {:description "July vacation", :amount -2604.01M}
+			expected-dec-transaction {:description "New year purchases", :amount -590.49M}]
 
 			(reset-bank)
-			(add-account-operation account-number "New year purchases" -590.49M dec-date)
-			(add-account-operation account-number "February salary" 6500.00M feb-date)
-			(add-account-operation account-number "July vacation" -2604.01M jul-date)
+			(add-account-transaction account-number "New year purchases" -590.49M dec-date)
+			(add-account-transaction account-number "February salary" 6500.00M feb-date)
+			(add-account-transaction account-number "July vacation" -2604.01M jul-date)
 			(is (= 1 (count (vals @bank))))
-			(is (every? (partial = expected-feb-operation) (get-in @bank [account-number feb-date])))
-			(is (every? (partial = expected-jul-operation) (get-in @bank [account-number jul-date])))
-			(is (every? (partial = expected-dec-operation) (get-in @bank [account-number dec-date])))
+			(is (every? (partial = expected-feb-transaction) (get-in @bank [account-number feb-date])))
+			(is (every? (partial = expected-jul-transaction) (get-in @bank [account-number jul-date])))
+			(is (every? (partial = expected-dec-transaction) (get-in @bank [account-number dec-date])))
 			(is (= feb-date (first (keys (get @bank account-number)))))
 			(is (= jul-date (second (keys (get @bank account-number)))))
 			(is (= dec-date (last (keys (get @bank account-number)))))
@@ -107,10 +107,10 @@
 
 		(reset-bank)
 		(get-account-by just-made-account-number)
-		(add-account-operation account-number "Purchase on Amazon" -3.34M yesterday)
-		(add-account-operation account-number "Withdraw" -180.00M today)
-		(add-account-operation account-number "Purchase on Uber" -45.23M yesterday)
-		(add-account-operation account-number "Deposit" 1000.00M before-yesterday)
+		(add-account-transaction account-number "Purchase on Amazon" -3.34M yesterday)
+		(add-account-transaction account-number "Withdrawal" -180.00M today)
+		(add-account-transaction account-number "Purchase on Uber" -45.23M yesterday)
+		(add-account-transaction account-number "Deposit" 1000.00M before-yesterday)
 
 
 		(testing "daily-balance"
@@ -157,7 +157,7 @@
 						],
 
 						today [
-							[{:description "Withdraw", :amount -180.00M}],
+							[{:description "Withdrawal", :amount -180.00M}],
 							771.43M
 						]
 					}]
@@ -191,7 +191,7 @@
 						],
 
 						today [
-							[{:description "Withdraw", :amount -180.00M}],
+							[{:description "Withdrawal", :amount -180.00M}],
 							771.43M
 						]
 					}]
@@ -209,6 +209,27 @@
 )
 
 (deftest test-periods-of-debt
-	(testing ""
+	(let [account-number "1000000000000066600000000000001"
+		nonexistent-account-number "XXX-NOT-FOUND-XXX"
+		oct-fifteenth (converter/from-string "2017-10-15")
+		oct-sixteenth (converter/from-string "2017-10-16")
+		oct-seventeenth (converter/from-string "2017-10-17")
+		oct-eighteenth (converter/from-string "2017-10-18")
+		oct-twenty-second (converter/from-string "2017-10-22")
+		oct-twenty-fifth (converter/from-string "2017-10-25")]
+
+		(reset-bank)
+		(add-account-transaction account-number "Deposit" 1000.00M oct-fifteenth)
+		(add-account-transaction account-number "Purchase on Amazon" -3.34M oct-sixteenth)
+		(add-account-transaction account-number "Purchase on Uber" -45.23M oct-sixteenth)
+		(add-account-transaction account-number "Withdrawal" -180.00M oct-seventeenth)
+		(add-account-transaction account-number "Purchase of a flight ticket" -800.00M oct-eighteenth)
+		(add-account-transaction account-number "Purchase of a espresso" -10.00M oct-twenty-second)
+		(add-account-transaction account-number "Deposit" 100.00M oct-twenty-fifth)
+
+
+		(testing "periods-of-debt"
+
+		)
 	)
 )

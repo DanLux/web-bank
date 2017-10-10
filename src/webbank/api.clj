@@ -21,25 +21,14 @@
 	(response {})
 )
 
-(defn credit-account
-	"Forwards http credit request to bank service."
+(defn request-transaction
+	"Forwards http transaction request to bank service."
 	[request]
 	(let [account-number (get request "account")
 		description (get request "description")
 		amount (.setScale (new BigDecimal (str (get request "amount"))) 2)
 		date (converter/from-string (get request "date"))]
-	(bank/add-account-operation account-number description amount date)
-	(response {}))
-)
-
-(defn debit-account
-	"Forwards http debit request to bank service."
-	[request]
-	(let [account-number (get request "account")
-		description (get request "description")
-		amount (.setScale (new BigDecimal (str (get request "amount"))) 2)
-		date (converter/from-string (get request "date"))]
-	(bank/add-account-operation account-number  description (- amount) date)
+	(bank/add-account-transaction account-number description amount date)
 	(response {}))
 )
 

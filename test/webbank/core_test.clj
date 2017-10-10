@@ -25,25 +25,27 @@
 		)
 	)
 
-	(testing "/credits endpoint"
-		(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20M, "date" "2016-07-13"})
-			expected-response (generate-string {})
-			response (request-application "/credits" json-request)]
+	(testing "/transactions endpoint"
+		(testing "for a credit transaction"
+			(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20M, "date" "2016-07-13"})
+				expected-response (generate-string {})
+				response (request-application "/transactions" json-request)]
 
-			(is (= 200 (:status response)))
-			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
-			(is (= expected-response (:body response)))
+				(is (= 200 (:status response)))
+				(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
+				(is (= expected-response (:body response)))
+			)
 		)
-	)
 
-	(testing "/debits endpoint"
-		(let [json-request (generate-string { "account" "BA47856", "description" "Purchase", "amount" 3651.98M, "date" "2015-12-21"})
-			expected-response (generate-string {})
-			response (request-application "/debits" json-request)]
+		(testing "for a debit transaction"
+			(let [json-request (generate-string { "account" "BA47856", "description" "Purchase", "amount" -3651.98M, "date" "2015-12-21"})
+				expected-response (generate-string {})
+				response (request-application "/transactions" json-request)]
 
-			(is (= 200 (:status response)))
-			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
-			(is (= expected-response (:body response)))
+				(is (= 200 (:status response)))
+				(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
+				(is (= expected-response (:body response)))
+			)
 		)
 	)
 

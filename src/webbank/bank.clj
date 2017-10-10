@@ -8,8 +8,7 @@
 
 
 (defn debug-bank []
-	(println "\nBank status:")
-	(println @bank)
+	(println (str "Bank status:\n" @bank "\n"))
 )
 
 (defn reset-bank
@@ -37,14 +36,14 @@
 	)
 )
 
-(defn add-account-operation
-	"Adds new operation to bank account identified by account-number.
-	This operation is represented by a short description, an amount and the date it happened."
+(defn add-account-transaction
+	"Adds new transaction to bank account identified by account-number.
+	This transaction is represented by a short description, an amount and the date it happened."
 	[account-number description amount date]
-	(let [new_operation {:description description :amount amount}]
+	(let [new_transaction {:description description :amount amount}]
 		(as-> (get-account-by account-number) input
 			(get input date [])
-			(conj input new_operation)
+			(conj input new_transaction)
 			(swap! bank assoc-in [account-number date] input)
 		)
 	)
@@ -61,7 +60,7 @@
 )
 
 (defn account-statement
-	"Returns a statement with operations and balances grouped by date for the bank account identified by account-number."
+	"Returns a statement with transactions and balances grouped by date for the bank account identified by account-number."
 	([account-number]
 	(let [account (get-account-by account-number)]
 		(loop [[current-date & next-dates] (keys account)
@@ -69,8 +68,8 @@
 				balance-accumulator 0.00M]
 			(if current-date
 				(do (let [new-balance (+ balance-accumulator (daily-balance account current-date))
-						  current-operations (get account current-date [])]
-					(recur next-dates (assoc statement-map current-date [current-operations new-balance]) new-balance))
+						  current-transactions (get account current-date [])]
+					(recur next-dates (assoc statement-map current-date [current-transactions new-balance]) new-balance))
 				)
 				statement-map
 			)
