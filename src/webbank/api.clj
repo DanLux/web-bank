@@ -5,12 +5,12 @@
 		[webbank.date-converter :as converter]))
 
 
-(defn debug-interceptor []
+(defn ^:private debug-interceptor []
 	;(println (str "Bank status:\n" @bank/bank "\n"))
 )
 
 
-(defn response
+(defn ^:private response
 	"Converts map responses to standard json."
 	[response-map]
 	(debug-interceptor)
