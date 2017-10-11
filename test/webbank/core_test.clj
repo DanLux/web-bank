@@ -14,17 +14,6 @@
 )
 
 (deftest test-routes
-	(testing "/reset endpoint"
-		(let [json-request (generate-string {})
-			expected-response (generate-string {})
-			response (request-application "/reset" json-request)]
-
-			(is (= 200 (:status response)))
-			(is (= "application/json; charset=utf-8" (get-in response [:headers "Content-Type"])))
-			(is (= expected-response (:body response)))
-		)
-	)
-
 	(testing "/transactions endpoint"
 		(testing "for a credit transaction"
 			(let [json-request (generate-string { "account" "BA47856", "description" "Salary", "amount" 2371.20M, "date" "2016-07-13"})
@@ -75,8 +64,11 @@
 	)
 
 	(testing "/debts endpoint"
-		(let [json-request (generate-string {"account" "BA47856", "start" "2015-07-13", "end" "2016-02-21"})
-			expected-response (generate-string {})
+		(let [json-request (generate-string {"account" "BA47856"})
+			expected-response (generate-string {
+				"debts" [{"principal" 3651.98M, "start" "2015-12-21", "end" "2016-07-12"},
+						{"principal" 1280.78M, "start" "2016-07-13"}]
+			})
 			response (request-application "/debts" json-request)]
 
 			(is (= 200 (:status response)))

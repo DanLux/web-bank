@@ -14,13 +14,6 @@
 )
 ;;;;;;;;;;;;;;;;;;;;;
 
-(defn reset
-	"Forwards http reset request to bank service."
-	[request]
-	(bank/reset-bank)
-	(response {})
-)
-
 (defn request-transaction
 	"Forwards http transaction request to bank service."
 	[request]
@@ -55,5 +48,5 @@
 	[request]
 	(let [account-number (get request "account")]
 	(response
-		(bank/periods-of-debt account-number)))
+		{"debts" (bank/periods-of-debt account-number)}))
 )

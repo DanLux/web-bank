@@ -12,7 +12,6 @@
 	(POST "/balances" {body :body} (api/request-balance body))
 	(POST "/statements" {body :body} (api/request-statement body))
 	(POST "/debts" {body :body} (api/request-debts body))
-	(POST "/reset" {body :body} (api/reset body))
 	(route/not-found "Resource not found")
 )
 
