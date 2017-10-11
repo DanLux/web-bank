@@ -5,14 +5,17 @@
 		[webbank.date-converter :as converter]))
 
 
-;;;;;;; DEBUG METHOD
+(defn debug-interceptor []
+	;(println (str "Bank status:\n" @bank/bank "\n"))
+)
+
+
 (defn response
 	"Converts map responses to standard json."
 	[response-map]
-	(bank/debug-bank)
+	(debug-interceptor)
 	(util/response response-map)
 )
-;;;;;;;;;;;;;;;;;;;;;
 
 (defn request-transaction
 	"Forwards http transaction request to bank service."

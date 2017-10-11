@@ -1,15 +1,12 @@
 (ns webbank.bank
 	(:require
-		[clj-time.core :as clj-time]))
+		[clj-time.core :as clj-time]
+		[webbank.date-converter :as converter]))
 
 
 (def ^:private empty-bank {})
 (def bank (atom empty-bank))
 
-
-(defn debug-bank []
-	(println (str "Bank status:\n" @bank "\n"))
-)
 
 (defn reset-bank
 	"Returns bank to its original state."
@@ -37,19 +34,19 @@
 )
 
 (defn add-account-transaction
-	"Adds new transaction to bank account identified by account-number.
-	This transaction is represented by a short description, an amount and the date it happened."
+	"Adds new bank transaction to account identified by account-number."
 	[account-number description amount date]
-	(let [new_transaction {:description description :amount amount}]
-		(as-> (get-account-by account-number) input
-			(get input date [])
-			(conj input new_transaction)
-			(swap! bank assoc-in [account-number date] input)
-		)
-	)
+	(when ((complement zero?) amount)
+		(let [new_transaction {:description description :amount amount}]
+			(as-> (get-account-by account-number) input
+				(get input date [])
+				(conj input new_transaction)
+				(swap! bank assoc-in [account-number date] input)
+			)
+		))
 )
 
-(defn daily-balance
+(defn daily-transactions-balance
 	"Returns the balance of all account transactions which happened on date."
 	[account date]
 	(->>
@@ -67,7 +64,7 @@
 				statement-map account
 				balance-accumulator 0.00M]
 			(if current-date
-				(do (let [new-balance (+ balance-accumulator (daily-balance account current-date))
+				(do (let [new-balance (+ balance-accumulator (daily-transactions-balance account current-date))
 						  current-transactions (get account current-date [])]
 					(recur next-dates (assoc statement-map current-date [current-transactions new-balance]) new-balance))
 				)
@@ -82,6 +79,12 @@
 		(take-while #((complement clj-time/after?) (first %) end-date))
 		(into (sorted-map))
 	))
+)
+
+(defn ^:private date-from-daily-statement
+	"Extracts transaction date from daily-statement."
+	[daily-statement]
+	(key daily-statement)
 )
 
 (defn ^:private balance-from-daily-statement
@@ -99,9 +102,41 @@
 	(balance-from-daily-statement (last (account-statement account-number)))
 )
 
+
+(defn ^:private next-transaction-dates
+	"Maps a transaction date to their very next for each transaction belonging to the account identified by account-number."
+	[account-number]
+	(let [transaction-dates (keys (get-account-by account-number))]
+		(loop [[current successor :as dates] transaction-dates
+				result {}]
+			(if (nil? current)
+				result
+				(recur (rest dates) (assoc result current successor))
+			)
+		))
+)
+
 (defn periods-of-debt
 	"Returns the periods where balances of the account (identified by account-number) has been negative."
 	[account-number]
-	(println "To be implemented")
-	{}
+
+	(def eve #(clj-time/minus % (clj-time/days 1)))
+
+	(let [full-statement (account-statement account-number)
+		next-transactions (next-transaction-dates account-number)
+		periods (for [daily-statement full-statement
+					:let [balance (balance-from-daily-statement daily-statement)
+						date (date-from-daily-statement daily-statement)
+						next-date (get next-transactions date)]
+					:when (neg? balance)]
+					{
+						:principal (.abs balance)
+						:start (converter/to-string date)
+					  	:end (when next-date (converter/to-string (eve next-date)))
+					})
+		last-debt (last periods)]
+		(if (and last-debt (nil? (:end last-debt)))
+			(conj (vec (drop-last periods)) (dissoc last-debt :end))
+			(vec periods))
+	)
 )

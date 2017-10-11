@@ -24,6 +24,19 @@
 )
 
 (deftest test-add-account-transaction
+	(testing "trying to add transactions with zero amount"
+		(let [account-number "000000-00"
+			description "Doing nothing"
+			amount 0.00M]
+
+			(reset-bank)
+			(add-account-transaction account-number description amount (converter/from-string "2017-04-01"))
+			(add-account-transaction account-number description amount (converter/from-string "2017-04-02"))
+			(add-account-transaction account-number description amount (converter/from-string "2017-04-03"))
+			(is (empty? (get @bank account-number)))
+		)
+	)
+
 	(testing "adding a single credit transaction"
 		(let [account-number "ABC01678"
 			description "Deposit"
@@ -112,17 +125,15 @@
 		(add-account-transaction account-number "Purchase on Uber" -45.23M yesterday)
 		(add-account-transaction account-number "Deposit" 1000.00M before-yesterday)
 
-
-		(testing "daily-balance"
+		(testing "daily-transactions-balance"
 			(testing "when no transactions were made on given date"
-				(is (zero? (daily-balance (get @bank account-number) tomorrow))))
+				(is (zero? (daily-transactions-balance (get @bank account-number) tomorrow))))
 
 			(testing "when transactions were made on given date"
-				(is (= 1000.00M (daily-balance (get @bank account-number) before-yesterday)))
-				(is (= -48.57M (daily-balance (get @bank account-number) yesterday)))
-				(is (= -180.00M (daily-balance (get @bank account-number) today))))
+				(is (= 1000.00M (daily-transactions-balance (get @bank account-number) before-yesterday)))
+				(is (= -48.57M (daily-transactions-balance (get @bank account-number) yesterday)))
+				(is (= -180.00M (daily-transactions-balance (get @bank account-number) today))))
 		)
-
 
 		(testing "current-balance"
 			(testing "when there is no such account"
@@ -134,7 +145,6 @@
 			(testing "for a regular used account"
 				(is (= 771.43M (current-balance account-number))))
 		)
-
 
 		(testing "account-statement"
 			(testing "when there is no such account"
@@ -211,25 +221,43 @@
 (deftest test-periods-of-debt
 	(let [account-number "1000000000000066600000000000001"
 		nonexistent-account-number "XXX-NOT-FOUND-XXX"
-		oct-fifteenth (converter/from-string "2017-10-15")
-		oct-sixteenth (converter/from-string "2017-10-16")
-		oct-seventeenth (converter/from-string "2017-10-17")
-		oct-eighteenth (converter/from-string "2017-10-18")
-		oct-twenty-second (converter/from-string "2017-10-22")
-		oct-twenty-fifth (converter/from-string "2017-10-25")]
+		just-made-account-number "0000004894-Y"]
 
 		(reset-bank)
-		(add-account-transaction account-number "Deposit" 1000.00M oct-fifteenth)
-		(add-account-transaction account-number "Purchase on Amazon" -3.34M oct-sixteenth)
-		(add-account-transaction account-number "Purchase on Uber" -45.23M oct-sixteenth)
-		(add-account-transaction account-number "Withdrawal" -180.00M oct-seventeenth)
-		(add-account-transaction account-number "Purchase of a flight ticket" -800.00M oct-eighteenth)
-		(add-account-transaction account-number "Purchase of a espresso" -10.00M oct-twenty-second)
-		(add-account-transaction account-number "Deposit" 100.00M oct-twenty-fifth)
+		(get-account-by just-made-account-number)
 
+		(testing "when there is no such account"
+			(is (= [] (periods-of-debt nonexistent-account-number))))
 
-		(testing "periods-of-debt"
+		(testing "when account has just been created"
+			(is (= [] (periods-of-debt just-made-account-number))))
 
+		(testing "for a regular used account"
+			(testing "when there was never a single period of debt"
+				(add-account-transaction account-number "Deposit" 1000.00M (converter/from-string "2017-10-15"))
+				(add-account-transaction account-number "Purchase on Amazon" -3.34M (converter/from-string "2017-10-16"))
+				(add-account-transaction account-number "Purchase on Uber" -45.23M (converter/from-string "2017-10-16"))
+				(add-account-transaction account-number "Withdrawal" -180.00M (converter/from-string "2017-10-17"))
+
+				(is (= [] (periods-of-debt account-number)))
+			)
+
+			(testing "when there is a current period of debt"
+				(add-account-transaction account-number "Purchase of a flight ticket" -800.00M (converter/from-string "2017-10-18"))
+				(add-account-transaction account-number "Purchase of a espresso" -10.00M (converter/from-string "2017-10-22"))
+
+				(let [expected-period [{:principal 28.57M, :start "2017-10-18", :end "2017-10-21"},
+									{:principal 38.57M, :start "2017-10-22"}]]
+				(is (= expected-period (periods-of-debt account-number))))
+			)
+
+			(testing "when there is no current period of debt"
+				(add-account-transaction account-number "Deposit" 38.57M (converter/from-string "2017-10-25"))
+
+				(let [expected-period [{:principal 28.57M, :start "2017-10-18", :end "2017-10-21"},
+									{:principal 38.57M, :start "2017-10-22", :end "2017-10-24"}]]
+				(is (= expected-period (periods-of-debt account-number))))
+			)
 		)
 	)
 )
