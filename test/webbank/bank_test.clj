@@ -5,20 +5,20 @@
 		[webbank.bank :refer :all]))
 
 
-(deftest test-get-account-by
+(deftest test-get-or-create-account-with
 	(let [account-number "ABC01678"]
 		(testing "when there is no such account"
 			(reset-bank)
 			(is (nil? (get @bank account-number)))
 			(is (zero? (count (vals @bank))))
-			(is (= (sorted-map) (get-account-by account-number)))
+			(is (= (sorted-map) (get-or-create-account-with account-number)))
 			(is (= 1 (count (vals @bank))))
 		)
 
 		(testing "when there is such account"
 			(is ((complement nil?) (get @bank account-number)))
 			(is (= 1 (count (vals @bank))))
-			(is (= (get @bank account-number) (get-account-by account-number)))
+			(is (= (get @bank account-number) (get-or-create-account-with account-number)))
 		)
 	)
 )
@@ -119,7 +119,7 @@
 		tomorrow (converter/from-string "2017-10-18")]
 
 		(reset-bank)
-		(get-account-by just-made-account-number)
+		(get-or-create-account-with just-made-account-number)
 		(add-account-transaction account-number "Purchase on Amazon" -3.34M yesterday)
 		(add-account-transaction account-number "Withdrawal" -180.00M today)
 		(add-account-transaction account-number "Purchase on Uber" -45.23M yesterday)
@@ -224,7 +224,7 @@
 		just-made-account-number "0000004894-Y"]
 
 		(reset-bank)
-		(get-account-by just-made-account-number)
+		(get-or-create-account-with just-made-account-number)
 
 		(testing "when there is no such account"
 			(is (= [] (periods-of-debt nonexistent-account-number))))

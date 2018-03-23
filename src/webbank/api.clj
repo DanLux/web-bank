@@ -6,14 +6,14 @@
 
 
 (defn ^:private debug-interceptor []
-	;(println (str "Bank status:\n" @bank/bank "\n"))
+	(println (str "Bank status:\n" @bank/bank "\n"))
 )
 
 
 (defn ^:private response
 	"Converts map responses to standard json."
 	[response-map]
-	(debug-interceptor)
+	;(debug-interceptor)
 	(util/response response-map)
 )
 

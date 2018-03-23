@@ -24,7 +24,7 @@
 	)
 )
 
-(defn get-account-by
+(defn get-or-create-account-with
 	"Retrieves bank account identified by account-number. In case there is none, creates a new account and returns it."
 	[account-number]
 	(if-let [bank-account (get @bank account-number)]
@@ -38,7 +38,7 @@
 	[account-number description amount date]
 	(when ((complement zero?) amount)
 		(let [new_transaction {:description description :amount amount}]
-			(as-> (get-account-by account-number) input
+			(as-> (get-or-create-account-with account-number) input
 				(get input date [])
 				(conj input new_transaction)
 				(swap! bank assoc-in [account-number date] input)
@@ -59,7 +59,7 @@
 (defn account-statement
 	"Returns a statement with transactions and balances grouped by date for the bank account identified by account-number."
 	([account-number]
-	(let [account (get-account-by account-number)]
+	(let [account (get-or-create-account-with account-number)]
 		(loop [[current-date & next-dates] (keys account)
 				statement-map account
 				balance-accumulator 0.00M]
@@ -106,7 +106,7 @@
 (defn ^:private next-transaction-dates
 	"Maps a transaction date to their very next for each transaction belonging to the account identified by account-number."
 	[account-number]
-	(let [transaction-dates (keys (get-account-by account-number))]
+	(let [transaction-dates (keys (get-or-create-account-with account-number))]
 		(loop [[current successor :as dates] transaction-dates
 				result {}]
 			(if (nil? current)
